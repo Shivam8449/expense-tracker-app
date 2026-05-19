@@ -77,7 +77,16 @@ src/
 
 Transaction state is managed in `TransactionContext.jsx`. On the first visit, the app loads sample transactions. After that, transactions are saved to the browser's `localStorage`, so user changes remain available after refreshing the page.
 
-The app uses tab-based navigation instead of separate route pages. `App.jsx` controls the active tab and displays the correct screen: dashboard, transaction list, history, analytics, or the add/edit transaction modal.
+The app uses React Router DOM for page navigation. `App.jsx` defines routes for the dashboard, transactions, history, and analytics screens. The bottom navigation updates the current route, while the add/edit transaction form remains a modal on top of the current screen.
+
+## Routes
+
+```text
+/               Dashboard
+/transactions   Transactions
+/history        History
+/analytics      Analytics
+```
 
 ## Notes
 

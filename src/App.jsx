@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { TransactionProvider } from './context/TransactionContext'
 import Header from './components/Header/Header'
@@ -10,9 +11,25 @@ import Analytics from './pages/Analytics/Analytics'
 import './styles/App.css'
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const location = useLocation()
+  const navigate = useNavigate()
   const [showAddModal, setShowAddModal] = useState(false)
   const [editTransaction, setEditTransaction] = useState(null)
+
+  const getActiveTab = () => {
+    switch (location.pathname) {
+      case '/transactions':
+        return 'transactions'
+      case '/history':
+        return 'history'
+      case '/analytics':
+        return 'analytics'
+      default:
+        return 'dashboard'
+    }
+  }
+
+  const activeTab = getActiveTab()
 
   const handleAddClick = () => {
     setEditTransaction(null)
@@ -29,48 +46,48 @@ function AppContent() {
     setEditTransaction(null)
   }
 
-  const getHeaderTitle = () => {
-    switch (activeTab) {
-      case 'transactions':
-        return 'Financial Serenity'
-      case 'analytics':
-        return 'Financial Serenity'
-      default:
-        return 'Financial Serenity'
+  const handleTabChange = (tab) => {
+    const routes = {
+      dashboard: '/',
+      transactions: '/transactions',
+      history: '/history',
+      analytics: '/analytics'
     }
-  }
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return (
-          <Dashboard 
-            onViewAll={() => setActiveTab('transactions')}
-            onTransactionClick={handleTransactionClick}
-          />
-        )
-      case 'transactions':
-        return <Transactions onTransactionClick={handleTransactionClick} />
-      case 'analytics':
-        return <Analytics />
-      case 'history':
-        return <Transactions onTransactionClick={handleTransactionClick} />
-      default:
-        return <Dashboard onViewAll={() => setActiveTab('transactions')} />
-    }
+    navigate(routes[tab] || '/')
   }
 
   return (
     <div className="app">
-      <Header title={getHeaderTitle()} />
+      <Header title="Financial Serenity" />
       
       <main className="app-content">
-        {renderContent()}
+        <Routes>
+          <Route
+            path="/"
+            element={(
+              <Dashboard 
+                onViewAll={() => navigate('/transactions')}
+                onTransactionClick={handleTransactionClick}
+              />
+            )}
+          />
+          <Route
+            path="/transactions"
+            element={<Transactions onTransactionClick={handleTransactionClick} />}
+          />
+          <Route
+            path="/history"
+            element={<Transactions onTransactionClick={handleTransactionClick} />}
+          />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       <BottomNavigation 
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onAddClick={handleAddClick}
       />
 
