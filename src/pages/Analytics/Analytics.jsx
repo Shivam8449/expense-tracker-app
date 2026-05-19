@@ -16,8 +16,16 @@ export default function Analytics() {
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
   
-  const breakdown = useMemo(() => {
-    return getCategoryBreakdown(year, month)
+  const monthTransactions = useMemo(() => {
+    return getTransactionsByMonth(year, month)
+  }, [getTransactionsByMonth, year, month])
+
+  const expenseBreakdown = useMemo(() => {
+    return getCategoryBreakdown(year, month, 'expense')
+  }, [getCategoryBreakdown, year, month])
+
+  const incomeBreakdown = useMemo(() => {
+    return getCategoryBreakdown(year, month, 'income')
   }, [getCategoryBreakdown, year, month])
   
   const monthlyTrend = useMemo(() => {
@@ -25,20 +33,27 @@ export default function Analytics() {
   }, [getMonthlyTrend])
   
   const totalExpenses = useMemo(() => {
-    return getTransactionsByMonth(year, month)
+    return monthTransactions
       .filter(t => t.type === 'expense')
       .reduce((acc, t) => acc + t.amount, 0)
-  }, [getTransactionsByMonth, year, month])
+  }, [monthTransactions])
+
+  const totalIncome = useMemo(() => {
+    return monthTransactions
+      .filter(t => t.type === 'income')
+      .reduce((acc, t) => acc + t.amount, 0)
+  }, [monthTransactions])
+
+  const netTotal = totalIncome - totalExpenses
 
   const previousMonth = new Date(year, month - 1, 1)
-  const previousMonthExpenses = useMemo(() => {
+  const previousMonthBalance = useMemo(() => {
     return getTransactionsByMonth(previousMonth.getFullYear(), previousMonth.getMonth())
-      .filter(t => t.type === 'expense')
-      .reduce((acc, t) => acc + t.amount, 0)
+      .reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0)
   }, [getTransactionsByMonth, previousMonth])
 
-  const percentChange = previousMonthExpenses > 0
-    ? ((totalExpenses - previousMonthExpenses) / previousMonthExpenses * 100).toFixed(1)
+  const percentChange = previousMonthBalance !== 0
+    ? ((netTotal - previousMonthBalance) / Math.abs(previousMonthBalance) * 100).toFixed(1)
     : 0
 
   const navigateMonth = (direction) => {
@@ -47,13 +62,17 @@ export default function Analytics() {
     setCurrentDate(newDate)
   }
 
-  const pieData = breakdown.map((item, index) => ({
-    name: getCategoryById(item.category).name,
+  const visibleBreakdown = expenseBreakdown.length > 0 ? expenseBreakdown : incomeBreakdown
+  const visibleBreakdownType = expenseBreakdown.length > 0 ? 'expense' : 'income'
+  const hasTransactions = monthTransactions.length > 0
+
+  const pieData = visibleBreakdown.map((item, index) => ({
+    name: getCategoryById(item.category, visibleBreakdownType).name,
     value: item.amount,
     color: COLORS[index % COLORS.length]
   }))
 
-  const topCategory = breakdown[0]
+  const topCategory = visibleBreakdown[0]
 
   return (
     <div className="analytics-page">
@@ -70,50 +89,73 @@ export default function Analytics() {
         </button>
       </div>
 
-      {breakdown.length > 0 ? (
+      {hasTransactions ? (
         <>
           <div className="total-card slide-up">
-            <div className="total-label">Total Expenditure</div>
-            <div className="total-amount">{formatCurrency(totalExpenses)}</div>
-            <div className={`total-comparison ${Number(percentChange) <= 0 ? 'positive' : 'negative'}`}>
-              {Number(percentChange) <= 0 ? '↓' : '↑'} {Math.abs(percentChange)}% {Number(percentChange) <= 0 ? 'less' : 'more'} than {previousMonth.toLocaleString('default', { month: 'long' })}
+            <div className="total-label">Net Flow</div>
+            <div className={`total-amount ${netTotal >= 0 ? 'positive' : 'negative'}`}>
+              {formatCurrency(netTotal)}
+            </div>
+            <div className={`total-comparison ${Number(percentChange) >= 0 ? 'positive' : 'negative'}`}>
+              {Number(percentChange) >= 0 ? '↑' : '↓'} {Math.abs(percentChange)}% than {previousMonth.toLocaleString('default', { month: 'long' })}
+            </div>
+          </div>
+
+          <div className="monthly-summary slide-up">
+            <div className="summary-pill">
+              <span>Income</span>
+              <strong>{formatCurrency(totalIncome)}</strong>
+            </div>
+            <div className="summary-pill">
+              <span>Expenses</span>
+              <strong>{formatCurrency(totalExpenses)}</strong>
             </div>
           </div>
 
           <div className="chart-section slide-up">
             <div className="donut-chart-container">
-              <ResponsiveContainer width={160} height={160}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    innerRadius={50}
-                    outerRadius={70}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="donut-center">
-                <div className="donut-percentage">{topCategory?.percentage || 0}%</div>
-                <div className="donut-label">{topCategory ? getCategoryById(topCategory.category).name : ''}</div>
-              </div>
+              {visibleBreakdown.length > 0 ? (
+                <>
+                  <ResponsiveContainer width={160} height={160}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="donut-center">
+                    <div className="donut-percentage">{topCategory?.percentage || 0}%</div>
+                    <div className="donut-label">
+                      {topCategory ? getCategoryById(topCategory.category, visibleBreakdownType).name : ''}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="chart-empty-text">No category data</div>
+              )}
             </div>
 
             <div className="category-breakdown">
-              <div className="breakdown-title">Spending Breakdown</div>
+              <div className="breakdown-title">
+                {visibleBreakdownType === 'expense' ? 'Spending Breakdown' : 'Income Breakdown'}
+              </div>
               <div className="breakdown-list">
-                {breakdown.slice(0, 5).map((item, index) => (
+                {visibleBreakdown.slice(0, 5).map((item, index) => (
                   <div key={item.category} className="breakdown-item">
                     <div 
                       className="breakdown-color" 
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
                     <span className="breakdown-name">
-                      {getCategoryById(item.category).name}
+                      {getCategoryById(item.category, visibleBreakdownType).name}
                     </span>
                     <span className="breakdown-amount">
                       {formatCurrency(item.amount)}
@@ -142,8 +184,13 @@ export default function Analytics() {
                   />
                   <YAxis hide />
                   <Bar 
-                    dataKey="total" 
-                    fill="#e5e5e5" 
+                    dataKey="income" 
+                    fill="#22c55e" 
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar 
+                    dataKey="expenses" 
+                    fill="#ef4444" 
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>

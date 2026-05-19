@@ -65,6 +65,14 @@
   margin-top: 4px;
 }
 
+.total-amount.positive {
+  color: var(--color-income);
+}
+
+.total-amount.negative {
+  color: var(--color-expense);
+}
+
 .total-comparison {
   font-size: 13px;
   color: var(--color-secondary);
@@ -77,6 +85,37 @@
 
 .total-comparison.negative {
   color: var(--color-expense);
+}
+
+/* Monthly Summary */
+.monthly-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summary-pill {
+  min-width: 0;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.summary-pill span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.summary-pill strong {
+  display: block;
+  font-size: clamp(16px, 4vw, 20px);
+  overflow-wrap: anywhere;
 }
 
 /* Chart Section */
@@ -110,6 +149,12 @@
   font-size: 11px;
   color: var(--color-secondary);
   text-transform: uppercase;
+}
+
+.chart-empty-text {
+  color: var(--color-secondary);
+  font-size: 14px;
+  text-align: center;
 }
 
 /* Category Breakdown */
@@ -244,6 +289,7 @@
 
   .month-navigation,
   .total-card,
+  .monthly-summary,
   .view-report-button {
     grid-column: 1;
   }
@@ -270,6 +316,10 @@
 }
 
 @media (max-width: 360px) {
+  .monthly-summary {
+    grid-template-columns: 1fr;
+  }
+
   .breakdown-item {
     gap: 8px;
   }

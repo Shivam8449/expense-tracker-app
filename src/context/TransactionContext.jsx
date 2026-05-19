@@ -98,9 +98,9 @@ export function TransactionProvider({ children }) {
     })
   }
 
-  const getCategoryBreakdown = (year, month) => {
+  const getCategoryBreakdown = (year, month, type = 'expense') => {
     const monthTransactions = getTransactionsByMonth(year, month)
-      .filter(t => t.type === 'expense')
+      .filter(t => t.type === type)
     
     const total = monthTransactions.reduce((acc, t) => acc + t.amount, 0)
     
@@ -123,13 +123,18 @@ export function TransactionProvider({ children }) {
     for (let i = 5; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
       const monthTransactions = getTransactionsByMonth(date.getFullYear(), date.getMonth())
-      const total = monthTransactions
+      const expenses = monthTransactions
         .filter(t => t.type === 'expense')
+        .reduce((acc, t) => acc + t.amount, 0)
+      const income = monthTransactions
+        .filter(t => t.type === 'income')
         .reduce((acc, t) => acc + t.amount, 0)
       
       months.push({
         month: date.toLocaleString('default', { month: 'short' }).toUpperCase(),
-        total
+        income,
+        expenses,
+        balance: income - expenses
       })
     }
     
