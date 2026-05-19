@@ -1,0 +1,267 @@
+.add-transaction {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--page-padding) 40px;
+  overflow-y: auto;
+}
+
+/* Type Toggle */
+.type-toggle {
+  display: flex;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  margin-bottom: 32px;
+}
+
+.type-button {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  color: var(--color-secondary);
+  transition: var(--transition);
+}
+
+.type-button.active {
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Amount Input */
+.amount-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.amount-input-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.currency-symbol {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--color-secondary);
+}
+
+.amount-input {
+  font-size: clamp(36px, 10vw, 52px);
+  font-weight: 300;
+  text-align: center;
+  width: min(62vw, 240px);
+  min-width: 0;
+  color: var(--color-primary);
+  background: transparent;
+}
+
+.amount-input::placeholder {
+  color: var(--color-border);
+}
+
+/* Category Section */
+.form-section {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+  gap: 12px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  min-width: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  transition: var(--transition);
+}
+
+.category-item:hover {
+  background-color: var(--color-border);
+}
+
+.category-item.selected {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-background);
+}
+
+.category-item.selected .category-icon {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.category-name {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* Date Input */
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.date-input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-secondary);
+  pointer-events: none;
+}
+
+/* Note Input */
+.note-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  resize: none;
+  min-height: 80px;
+}
+
+.note-input::placeholder {
+  color: var(--color-secondary);
+}
+
+/* Name Input */
+.name-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.name-input::placeholder {
+  color: var(--color-secondary);
+}
+
+/* Submit Button */
+.submit-button {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  margin-top: auto;
+  transition: var(--transition);
+}
+
+.submit-button:hover {
+  opacity: 0.9;
+}
+
+.submit-button:active {
+  transform: scale(0.98);
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Validation Error */
+.error-text {
+  font-size: 12px;
+  color: var(--color-expense);
+  margin-top: 4px;
+}
+
+/* Receipt Preview */
+.receipt-preview {
+  width: 100%;
+  height: 120px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  background-image: linear-gradient(135deg, #e5e5e5 25%, transparent 25%),
+    linear-gradient(225deg, #e5e5e5 25%, transparent 25%),
+    linear-gradient(45deg, #e5e5e5 25%, transparent 25%),
+    linear-gradient(315deg, #e5e5e5 25%, var(--color-surface) 25%);
+  background-position: 10px 0, 10px 0, 0 0, 0 0;
+  background-size: 20px 20px;
+  background-repeat: repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.receipt-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .add-transaction {
+    padding-bottom: 32px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .type-toggle {
+    margin-bottom: 24px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .category-item {
+    padding: 12px 6px;
+  }
+
+  .category-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
